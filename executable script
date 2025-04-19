@@ -1,0 +1,261 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# # 📊 Medical Insurance Data Analysis
+# 
+# This beginner-friendly Python project explores how different factors affect medical insurance charges using a CSV dataset. We'll use Python basics like **lists**, **loops**, **functions**, and **classes** to find insights.
+# 
+# ## Objectives:
+# - Read and store the CSV data.
+# - Analyze average charges by gender.
+# - Compare smoking habits and age by gender.
+# - Draw conclusions using simple data analysis.
+# 
+# ---
+# 
+
+# In[16]:
+
+
+import csv
+
+
+# In[16]:
+
+
+import csv
+
+
+# In[17]:
+
+
+import pandas
+data = pandas.read_csv('insurance.csv')
+data
+
+
+# In[ ]:
+
+
+
+
+
+# In[18]:
+
+
+import csv
+
+# Lists to hold each column
+ages = []
+sexes = []
+bmis = []
+children = []
+smokers = []
+regions = []
+charges = []
+
+# Open and read the CSV file
+with open('insurance.csv', newline='') as file:
+    reader = csv.DictReader(file)
+    for row in reader:
+        ages.append(int(row['age']))
+        sexes.append(row['sex'])
+        bmis.append(float(row['bmi']))
+        children.append(int(row['children']))
+        smokers.append(row['smoker'])
+        regions.append(row['region'])
+        charges.append(float(row['charges']))
+
+
+# CLASS FOR EACH PERSON
+
+# In[19]:
+
+
+class Person:
+    def __init__(self, age, sex, bmi, children, smoker, region, charge):
+        self.age = age
+        self.sex = sex
+        self.bmi = bmi
+        self.children = children
+        self.smoker = smoker
+        self.region = region
+        self.charge = charge
+    
+
+
+# LIST OF PERSON OBJECT
+
+# In[20]:
+
+
+people = []
+for i in range(len(ages)):
+    person = Person(ages[i], sexes[i], bmis[i], children[i], smokers[i], regions[i], charges[i])
+    people.append(person)
+
+
+# FUNTION TO GET AVERAGE CHARGE
+
+# In[21]:
+
+
+def average_charge(person_list):
+    total = 0
+    for person in person_list:
+        total += person.charge
+    return total / len(person_list)
+
+print(f"Average charge for all people: ${average_charge(people):.2f}")
+
+
+# Analyze Smokers vs Non-Smokers
+
+# In[22]:
+
+
+def get_smoker_stats(people):
+    smokers_list = []
+    non_smokers_list = []
+
+    for person in people:
+        if person.smoker == 'yes':
+            smokers_list.append(person)
+        else:
+            non_smokers_list.append(person)
+    
+    avg_smokers = average_charge(smokers_list)
+    avg_non_smokers = average_charge(non_smokers_list)
+
+    print(f"Smokers average charge: ${avg_smokers:.2f}")
+    print(f"Non-smokers average charge: ${avg_non_smokers:.2f}")
+
+get_smoker_stats(people)
+
+
+# Find the Person With the Highest Charge
+
+# In[23]:
+
+
+def most_expensive_patient(people):
+    highest = people[0]
+    for person in people:
+        if person.charge > highest.charge:
+            highest = person
+    return highest
+
+highest_person = most_expensive_patient(people)
+print(f"Highest charge: ${highest_person.charge:.2f} by a {highest_person.age}-year-old {highest_person.sex}")
+
+
+# STATISTICS ON THE DATASET
+# thisdict = {
+#   "key": "value",
+#   "key2": "value2",
+# }
+
+# In[27]:
+
+
+data_summary = {
+    "total_people": len(people),
+    "average_age": round(sum(ages) / len(ages), 2),
+    "average_bmi": round(sum(bmis) / len(bmis), 2),
+    "average_charges": round(sum(charges) / len(charges), 2)
+}
+print(data_summary)
+
+
+# In[ ]:
+
+
+
+
+
+# Let’s see how charges vary by sex — this could show bias or reflect real-world differences.
+
+# In[28]:
+
+
+male_charges = []
+female_charges = []
+
+for person in people:
+    if person.sex == 'male':
+        male_charges.append(person.charge)
+    else:
+        female_charges.append(person.charge)
+
+print(f"Average charges (Male): ${sum(male_charges)/len(male_charges):.2f}")
+print(f"Average charges (Female): ${sum(female_charges)/len(female_charges):.2f}")
+
+
+# 🧠 Finding: Charges by Gender
+# Average charges for males: $13,956.75
+# 
+# Average charges for females: $12,569.58
+# 
+# ✍️ Interpretation:
+# This suggests that men are paying more for medical insurance on average compared to women in this dataset. The difference is about $1,387.17.
+# 
+# 🔎 Possible Reasons:
+# Here are a few beginner-level insights you could explore:
+# 
+# Do more males smoke than females in this dataset?
+# Smoking raises medical costs a lot, so that could explain the gap.
+# 
+# Are males older or have higher BMIs on average?
+# Age and BMI also affect charges.
+
+# In[29]:
+
+
+male_smokers = 0
+female_smokers = 0
+
+for person in people:
+    if person.smoker == "yes":
+        if person.sex == "male":
+            male_smokers += 1
+        else:
+            female_smokers += 1
+
+print(f"Male smokers: {male_smokers}")
+print(f"Female smokers: {female_smokers}")
+
+
+# In[30]:
+
+
+male_ages = [p.age for p in people if p.sex == "male"]
+female_ages = [p.age for p in people if p.sex == "female"]
+
+print(f"Average male age: {sum(male_ages)/len(male_ages):.2f}")
+print(f"Average female age: {sum(female_ages)/len(female_ages):.2f}")
+
+
+# ### 📊 Deeper Gender Analysis
+# 
+# 
+# ### 🚬 Smokers by Gender
+# Male smokers: 159
+# Female smokers: 115
+# 
+# This shows that there are more male smokers, which could be one reason why males pay more on average for insurance.
+# 
+# ### 🎂 Average Age by Gender
+# 
+# Average male age: 38.92
+# Average female age: 39.50
+# 
+# There’s no major age difference, so age is likely not the main cause of the price gap.
+# 
+# ### 💡 Conclusion:
+# The higher average charge for men might be linked to the higher number of male smokers, not their age.
+
+# In[ ]:
+
+
+
+
